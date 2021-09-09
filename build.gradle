@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'maven-publish'
+}
+
+group 'me.rancraftplayz'
+version '0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven { url = "https://maven.fabricmc.net" }
+    maven { url = "https://maven.quiltmc.org/repository/release/" }
+    maven { url = "https://oss.sonatype.org/content/groups/public/" }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation 'org.cadixdev:lorenz:0.5.7'
+    implementation 'org.cadixdev:lorenz-io-proguard:0.5.7'
+    implementation 'net.fabricmc:lorenz-tiny:3.0.0'
+    implementation 'net.fabricmc:tiny-remapper:0.5.0:fat'
+    implementation 'net.fabricmc:stitch:0.6.1'
+}
+
+shadowJar {
+    archiveBaseName.set("mappingsconverter")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    exclude(
+            "**/LICENSE.md",
+            "**/LICENSE.txt",
+            "**/LICENSE",
+            "**/NOTICE",
+            "**/NOTICE.txt",
+            "**/module-info.class",
+            "META-INF/proguard/**",
+            "META-INF/maven/**",
+            "META-INF/versions/**",
+            "META-INF/com.android.tools/**"
+    )
+
+    mergeServiceFiles()
+}
