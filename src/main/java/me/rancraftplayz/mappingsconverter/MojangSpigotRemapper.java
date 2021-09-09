@@ -78,7 +78,7 @@ public class MojangSpigotRemapper {
         return mergeTinyV2(new File(String.valueOf(Path.of(proguard.toPath() + "-out.tiny"))), new File(String.valueOf(Path.of(csrg.toPath() + "-out.tiny"))), output);
     }
 
-    // Don't me just going to use stich in a scuffed way
+    // Don't mind me just going to use stitch in a scuffed way
     private static File mergeTinyV2(File mergeA, File mergeB, File output) throws IOException {
         String[] args = new String[]{mergeA.getPath(), mergeB.getPath(), output.getPath()};
         new CommandMergeTinyV2().run(args);
