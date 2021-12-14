@@ -1,5 +1,6 @@
 package me.rancraftplayz.mappingsconverter;
 
+import me.ran.mappings_stuff_idk.MappingsGenerator;
 import net.fabricmc.accesswidener.AccessWidener;
 import net.fabricmc.accesswidener.AccessWidenerWriter;
 import net.fabricmc.lorenztiny.TinyMappingsWriter;
@@ -28,12 +29,11 @@ public class MojangSpigotRemapper {
     public static void main(String[] args) throws IOException {
         try {
             File inputFile = new File(args[0]);
-            File proguardFile = new File(args[1]);
-            File csrgFile = new File(args[2]);
+            String mcVersion = args[1];
             if (inputFile.exists()) {
                 List<Path> libs = new ArrayList<>();
-                libs.add(new File(args[3]).toPath());
-                remap(inputFile.toPath(), proguardFile.toPath(), csrgFile.toPath(), libs);
+                libs.add(new File(args[2]).toPath());
+                remap(inputFile.toPath(), mcVersion, libs);
                 return;
             }
         } catch (ArrayIndexOutOfBoundsException exception) {
@@ -42,8 +42,8 @@ public class MojangSpigotRemapper {
         System.out.println("File does not exist or not found! (Or it's some other error idk)");
     }
 
-    public static void remapAll(Path input, Path proguardPath, Path csrgPath, List<Path> libraries, @Nullable Path accessWidener,@Nullable List<Path> accessWidnerLibs) throws IOException {
-        File mappings = proguardCsrgTiny(proguardPath.toFile(), csrgPath.toFile(), input.toFile());
+    public static void remapAll(Path input, String mcVersion, List<Path> libraries, @Nullable Path accessWidener,@Nullable List<Path> accessWidnerLibs) throws IOException {
+        File mappings = proguardCsrgTiny(mcVersion, new File("mappings/"));
         if (accessWidener != null) {
             remapAccessWidener(input, accessWidener, mappings.toPath(), Objects.requireNonNullElseGet(accessWidnerLibs, ArrayList::new));
         }
@@ -72,11 +72,8 @@ public class MojangSpigotRemapper {
         output.delete();
     }
 
-    public static void remap(Path input, Path proguardPath, Path csrgPath, List<Path> libraries) throws IOException {
-        File proguard = proguardPath.toFile();
-        File csrg = csrgPath.toFile();
-
-        File mappings = proguardCsrgTiny(proguard, csrg, input.toFile());
+    public static void remap(Path input, String mcVersion, List<Path> libraries) throws IOException {
+        File mappings = proguardCsrgTiny(mcVersion, new File("mappings/"));
 
         File tempJar = Paths.get(input + ".temp.jar").toFile();
 
@@ -119,27 +116,7 @@ public class MojangSpigotRemapper {
         tempJar.renameTo(input.toFile());
     }
 
-    public static File proguardCsrgTiny(File proguard, File csrg, File outputPath) throws IOException {
-        MappingSet proguardMappings = new ProGuardReader(Files.newBufferedReader(proguard.toPath())).read();
-        MappingSet csrgMappings = new CSrgReader(Files.newBufferedReader(csrg.toPath())).read();
-
-        try (TinyMappingsWriter pWriter = new TinyMappingsWriter(Files.newBufferedWriter(Path.of(proguard.toPath() + "-out.tiny")), "official", "mojang")) {
-            pWriter.write(proguardMappings.reverse());
-        }
-        try (TinyMappingsWriter cWriter = new TinyMappingsWriter(Files.newBufferedWriter(Path.of(csrg.toPath() + "-out.tiny")), "official", "spigot")) {
-            cWriter.write(csrgMappings);
-        }
-
-        File output = new File(outputPath.getParent() + "/proguard-csrg.tiny");
-
-        return mergeTinyV2(new File(String.valueOf(Path.of(proguard.toPath() + "-out.tiny"))), new File(String.valueOf(Path.of(csrg.toPath() + "-out.tiny"))), output);
-    }
-
-    // Don't mind me just going to use stitch in a scuffed way
-    private static File mergeTinyV2(File mergeA, File mergeB, File output) throws IOException {
-        String[] args = new String[]{mergeA.getPath(), mergeB.getPath(), output.getPath()};
-        new CommandMergeTinyV2().run(args);
-
-        return output;
+    public static File proguardCsrgTiny(String mcVersion, File outputPath) throws IOException {
+        return MappingsGenerator.generateMojmapSpigotMappings(mcVersion, outputPath);
     }
 }
