@@ -6,8 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class MojangSpigotAccessWidenerRemapper {
-    public static void remap(Path input, String mcVersion, List<Path> libraries) throws IOException {
-        File mappings = MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("mappings/"));
+    public static void remap(Path input, File mappingsDir, String mcVersion, List<Path> libraries) throws IOException {
+        File mappings = MojangSpigotRemapper.proguardCsrgTiny(mcVersion, mappingsDir);
 
         ApplyAccessWidener applier = new ApplyAccessWidener(input.toFile(), mappings, libraries);
 

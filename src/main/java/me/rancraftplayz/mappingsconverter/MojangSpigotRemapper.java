@@ -33,7 +33,7 @@ public class MojangSpigotRemapper {
             if (inputFile.exists()) {
                 List<Path> libs = new ArrayList<>();
                 libs.add(new File(args[2]).toPath());
-                remap(inputFile.toPath(), mcVersion, libs);
+                remap(inputFile.toPath(), new File("mappings/"), mcVersion, libs);
                 return;
             }
         } catch (ArrayIndexOutOfBoundsException exception) {
@@ -42,8 +42,8 @@ public class MojangSpigotRemapper {
         System.out.println("File does not exist or not found! (Or it's some other error idk)");
     }
 
-    public static void remapAll(Path input, String mcVersion, List<Path> libraries, @Nullable Path accessWidener,@Nullable List<Path> accessWidnerLibs) throws IOException {
-        File mappings = proguardCsrgTiny(mcVersion, new File("mappings/"));
+    public static void remapAll(Path input, File mappingsDir, String mcVersion, List<Path> libraries, @Nullable Path accessWidener,@Nullable List<Path> accessWidnerLibs) throws IOException {
+        File mappings = proguardCsrgTiny(mcVersion, mappingsDir);
         if (accessWidener != null) {
             remapAccessWidener(input, accessWidener, mappings.toPath(), Objects.requireNonNullElseGet(accessWidnerLibs, ArrayList::new));
         }
@@ -72,8 +72,8 @@ public class MojangSpigotRemapper {
         output.delete();
     }
 
-    public static void remap(Path input, String mcVersion, List<Path> libraries) throws IOException {
-        File mappings = proguardCsrgTiny(mcVersion, new File("mappings/"));
+    public static void remap(Path input, File mappingsDir, String mcVersion, List<Path> libraries) throws IOException {
+        File mappings = proguardCsrgTiny(mcVersion, mappingsDir);
 
         File tempJar = Paths.get(input + ".temp.jar").toFile();
 
