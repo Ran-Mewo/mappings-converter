@@ -1,6 +1,7 @@
 package me.rancraftplayz.mappingsconverter;
 
 import net.fabricmc.accesswidener.AccessWidener;
+import net.fabricmc.accesswidener.AccessWidenerClassVisitor;
 import net.fabricmc.accesswidener.AccessWidenerReader;
 import net.fabricmc.accesswidener.AccessWidenerVisitor;
 import org.objectweb.asm.ClassReader;
@@ -41,10 +42,15 @@ public class ApplyAccessWidener {
         }
     }
 
-    public ApplyAccessWidener(File accessWidener, File mappings, List<Path> libraries) {
+    public ApplyAccessWidener(File accessWidener, File mappings, List<Path> libraries) throws IOException {
         inputHash = Checksum.sha256(accessWidener);
+        File UwU = new File(accessWidener.getParent(), "tempUwU.accesswidener");
+        if (UwU.exists()) {
+            UwU.delete();
+        }
 
-        this.accessWidener = RemapAccessWidener.remap(accessWidener, mappings, libraries);
+        this.accessWidener = new RemapAccessWidener(accessWidener, UwU).remap(mappings, libraries).accessWidener;
+        UwU.delete();
     }
 
     public void apply(File file) {
@@ -64,7 +70,7 @@ public class ApplyAccessWidener {
             protected byte[] transform(ZipEntry zipEntry, byte[] input) {
                 ClassReader reader = new ClassReader(input);
                 ClassWriter writer = new ClassWriter(0);
-                ClassVisitor classVisitor = AccessWidenerVisitor.createClassVisitor(Opcodes.ASM9, writer, accessWidener);
+                ClassVisitor classVisitor = AccessWidenerClassVisitor.createClassVisitor(Opcodes.ASM9, writer, accessWidener);
 
                 reader.accept(classVisitor, 0);
                 return writer.toByteArray();

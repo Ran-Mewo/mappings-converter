@@ -16,7 +16,7 @@ public class MojangSpigotAccessWidenerRemapper {
         }
     }
 
-    public static void remap(Path input, Path mappings, List<Path> libraries) {
+    public static void remap(Path input, Path mappings, List<Path> libraries) throws IOException {
         ApplyAccessWidener applier = new ApplyAccessWidener(input.toFile(), mappings.toFile(), libraries);
 
         for (Path libPath : libraries) {

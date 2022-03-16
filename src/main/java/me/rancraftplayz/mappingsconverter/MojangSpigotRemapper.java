@@ -3,15 +3,10 @@ package me.rancraftplayz.mappingsconverter;
 import me.ran.mappings_stuff_idk.MappingsGenerator;
 import net.fabricmc.accesswidener.AccessWidener;
 import net.fabricmc.accesswidener.AccessWidenerWriter;
-import net.fabricmc.lorenztiny.TinyMappingsWriter;
-import net.fabricmc.stitch.commands.tinyv2.CommandMergeTinyV2;
-import net.fabricmc.tinyremapper.OutputConsumerPath;
-import net.fabricmc.tinyremapper.TinyRemapper;
-import net.fabricmc.tinyremapper.TinyUtils;
-import net.fabricmc.tinyremapper.extension.mixin.MixinExtension;
-import org.cadixdev.lorenz.MappingSet;
-import org.cadixdev.lorenz.io.proguard.ProGuardReader;
-import org.cadixdev.lorenz.io.srg.csrg.CSrgReader;
+import net.fabricmc.modified.OutputConsumerPath;
+import net.fabricmc.modified.TinyRemapper;
+import net.fabricmc.modified.TinyUtils;
+import net.fabricmc.modified.extension.mixin.MixinExtension;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -51,25 +46,26 @@ public class MojangSpigotRemapper {
     }
 
     public static void remapAccessWidener(Path inputJar, Path input, Path mappings, List<Path> libs) throws IOException {
-        AccessWidener accessWidener = RemapAccessWidener.remap(input.toFile(), mappings.toFile(), libs, true);
-
-        AccessWidenerWriter writer = new AccessWidenerWriter(accessWidener);
-
-        StringWriter wat = new StringWriter();
-        writer.write(wat);
+//        AccessWidener accessWidener = RemapAccessWidener.remap(input.toFile(), mappings.toFile(), libs, true);
+//
+//        AccessWidenerWriter writer = new AccessWidenerWriter(accessWidener);
+//
+//        StringWriter wat = new StringWriter();
+//        writer.write(wat);
 
         File output = Paths.get(input.toFile().getParent() + "/" + org.apache.commons.io.FilenameUtils.removeExtension(input.toFile().getName()) + "-obf.accesswidener").toFile();
         if (output.exists()) {
             output.delete();
         }
-        output.createNewFile();
 
-        FileWriter ono = new FileWriter(output);
-        ono.write(wat.toString());
-        ono.close();
+        File accessWidener = new RemapAccessWidener(input.toFile(), output).remap(mappings.toFile(), libs, true).outputFile;
 
-        ZipUtils.addFilesToZip(inputJar.toFile(), new File[]{output});
+        ZipUtils.addFilesToZip(inputJar.toFile(), new File[]{accessWidener});
         output.delete();
+    }
+
+    public static void remapAccessWidenerNoNewFile(Path input, Path mappings, List<Path> libs) throws IOException {
+        new RemapAccessWidener(input.toFile(), input.toFile()).remap(mappings.toFile(), libs, true);
     }
 
     public static void remap(Path input, File mappingsDir, String mcVersion, List<Path> libraries) throws IOException {
