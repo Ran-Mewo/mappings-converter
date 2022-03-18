@@ -37,8 +37,14 @@ public class FabricToIgnite {
 //    public static void main(String[] args) throws ParseMetadataException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 //        convert(new File("lithium.jar"), new File("outputJar"), new File("temp"), false, "1.18.2", false);
 //    }
+    public LoaderModMetadata modMetadata;
+    public AccessWidenerRemapper awRemapper;
 
-    public static File convert(File file, File outputDir, File tempDir, boolean metaverse, String mcVersion, boolean isDevelopment) throws IOException, ParseMetadataException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public FabricToIgnite(AccessWidenerRemapper remapper) {
+        this.awRemapper = remapper;
+    }
+
+    public File convert(File file, File outputDir, File tempDir, boolean metaverse, String mcVersion, boolean isDevelopment) throws IOException, ParseMetadataException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         File jarFile = new File(outputDir, file.getName());
         if (!exists(jarFile.exists(), metaverse)) {
             if (tempDir.exists()) tempDir.delete();
@@ -46,7 +52,7 @@ public class FabricToIgnite {
             JarUnpacker unpacker = new JarUnpacker();
             unpacker.unpack(file.getPath(), tempDir.getPath());
 
-            LoaderModMetadata modMetadata = readModMetadata(new FileInputStream(new File(tempDir, "fabric.mod.json")));
+            modMetadata = readModMetadata(new FileInputStream(new File(tempDir, "fabric.mod.json")));
             if (!modMetadata.getJars().isEmpty()) {
                 File metaInf = new File(tempDir, "META-INF/jars");
                 File[] files = metaInf.listFiles();
@@ -70,7 +76,7 @@ public class FabricToIgnite {
     }
 
 //    static List<File> classFiles = new ArrayList<>();
-    private static File map(File jarFile, File directory, String mcVersion, String to, boolean metaverse, File file, File outputDir, boolean isDevelopment, @Nullable String accessWidenerName) throws IOException, ParseMetadataException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    private File map(File jarFile, File directory, String mcVersion, String to, boolean metaverse, File file, File outputDir, boolean isDevelopment, @Nullable String accessWidenerName) throws IOException, ParseMetadataException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 //        if (!classFiles.isEmpty()) classFiles = new ArrayList<>();
 //        findClassFiles(directory);
 //
@@ -124,9 +130,10 @@ public class FabricToIgnite {
         libs.add(minecraftJarMojang.toPath());
         libs.add(minecraftJarSpigot.toPath());
 
-//        if (accessWidener != null) {
+        if (accessWidener != null) {
 //            MojangSpigotRemapper.remapAccessWidenerNoNewFile(accessWidener.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")).toPath(), libs);
-//        }
+            awRemapper.remap(accessWidener);
+        }
 
         jarFile.getParentFile().mkdirs();
 
@@ -141,7 +148,7 @@ public class FabricToIgnite {
         return jarFile;
     }
 
-    private static void remap(Path input, File mappings, List<Path> libraries, String to, boolean minecraftServer, String intermediary) throws IOException {
+    private void remap(Path input, File mappings, List<Path> libraries, String to, boolean minecraftServer, String intermediary) throws IOException {
         File tempJar = Paths.get(input + ".temp.jar").toFile();
 
         TinyRemapper remapper;
@@ -196,8 +203,8 @@ public class FabricToIgnite {
         return exists;
     }
 
-    public static void convertJson(InputStream is, File outputFile) throws ParseMetadataException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        LoaderModMetadata modMetadata = readModMetadata(is);
+    public void convertJson(InputStream is, File outputFile) throws ParseMetadataException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        if (modMetadata == null) modMetadata = readModMetadata(is);
 
         List<String> dependencies = modMetadata.getDependencies().stream().filter(d -> d.getKind() == ModDependency.Kind.DEPENDS).map(ModDependency::getModId).collect(java.util.stream.Collectors.toList());
         List<String> accessWideners = new ArrayList<>();
