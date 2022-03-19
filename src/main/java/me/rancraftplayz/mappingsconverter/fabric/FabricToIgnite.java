@@ -245,7 +245,7 @@ public class FabricToIgnite {
     // All the code below and in the metadata folder are from the Fabric Loader
     // Which is licensed under Apache License 2.0
 
-    private static LoaderModMetadata readModMetadata(InputStream is) throws IOException, ParseMetadataException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public static LoaderModMetadata readModMetadata(InputStream is) throws IOException, ParseMetadataException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         // So some context:
         // Per the json specification, ordering of fields is not typically enforced.
         // Furthermore we cannot guarantee the `schemaVersion` is the first field in every `fabric.mod.json`
