@@ -39,9 +39,11 @@ public class FabricToIgnite {
 //    }
     public LoaderModMetadata modMetadata;
     public AccessWidenerRemapper awRemapper;
+    public EntryPointer entryPointer;
 
-    public FabricToIgnite(AccessWidenerRemapper remapper) {
+    public FabricToIgnite(AccessWidenerRemapper remapper, EntryPointer entryPointer) {
         this.awRemapper = remapper;
+        this.entryPointer = entryPointer;
     }
 
     public File convert(File file, File outputDir, File tempDir, boolean metaverse, String mcVersion, boolean isDevelopment) throws IOException, ParseMetadataException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
@@ -53,6 +55,7 @@ public class FabricToIgnite {
             unpacker.unpack(file.getPath(), tempDir.getPath());
 
             modMetadata = readModMetadata(new FileInputStream(new File(tempDir, "fabric.mod.json")));
+            entryPointer.loadMetadata(modMetadata);
             if (!modMetadata.getJars().isEmpty()) {
                 File metaInf = new File(tempDir, "META-INF/jars");
                 File[] files = metaInf.listFiles();
@@ -204,7 +207,10 @@ public class FabricToIgnite {
     }
 
     public void convertJson(InputStream is, File outputFile) throws ParseMetadataException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        if (modMetadata == null) modMetadata = readModMetadata(is);
+        if (modMetadata == null) {
+            modMetadata = readModMetadata(is);
+            entryPointer.loadMetadata(modMetadata);
+        }
 
         List<String> dependencies = modMetadata.getDependencies().stream().filter(d -> d.getKind() == ModDependency.Kind.DEPENDS).map(ModDependency::getModId).collect(java.util.stream.Collectors.toList());
         List<String> accessWideners = new ArrayList<>();
