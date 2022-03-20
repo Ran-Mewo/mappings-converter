@@ -138,11 +138,11 @@ public class FabricToIgnite {
 
         jarFile.getParentFile().mkdirs();
 
-        remap(packer.pack(directory.getAbsolutePath(), jarFile.getAbsolutePath()).toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, to, false, "intermediary");
+        remap(packer.pack(directory.getAbsolutePath(), jarFile.getAbsolutePath()).toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, "named", false, "intermediary");
 
 //        classFiles = new ArrayList<>();
         deleteDirectory(directory);
-        remap(jarFile.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, to, false, "named");
+        remap(jarFile.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, "mojang", false, "named");
         deleteDirectory(directory);
         remap(jarFile.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, to, false, "mojang");
         deleteDirectory(directory);
