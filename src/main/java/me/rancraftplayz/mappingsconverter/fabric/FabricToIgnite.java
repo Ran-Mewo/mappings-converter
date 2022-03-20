@@ -29,9 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class FabricToIgnite {
 //    public static void main(String[] args) throws ParseMetadataException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
@@ -188,6 +186,55 @@ public class FabricToIgnite {
 //            }
 //        }
 //    }
+
+    public static File getServerJar(String mcVersion, File mappingsFile) throws IOException {
+        File serverJar = new File("cache/", "minecraft-" + mcVersion + "-spigot.jar");
+        File cachedServerJar = new File("cache/", "minecraft-" + mcVersion + "-spigot-cached.jar");
+        if (!cachedServerJar.exists()) {
+            if (!serverJar.exists()) {
+                serverJar = remap(getMojangServerJar(mcVersion).toPath(), mappingsFile, serverJar);
+            }
+            Files.copy(serverJar.toPath(), cachedServerJar.toPath());
+        }
+        return cachedServerJar;
+    }
+
+    private static File remap(Path input, File mappings, File outputFile) throws IOException {
+        TinyRemapper remapper = TinyRemapper.newRemapper().withMappings(TinyUtils.createTinyMappingProvider(mappings.toPath(), "official", "spigot")).ignoreConflicts(true).renameInvalidLocals(true).rebuildSourceFilenames(true).resolveMissing(true).build();
+
+        OutputConsumerPath outputConsumer = (new OutputConsumerPath.Builder(outputFile.toPath()).build());
+        outputConsumer.addNonClassFiles(input);
+        remapper.readInputs(input);
+
+        remapper.apply(outputConsumer);
+        outputConsumer.close();
+        remapper.finish();
+        return outputFile;
+    }
+
+    private static File getMojangServerJar(String mcVersion) throws IOException {
+        File mojangJar = new File("cache/", "mojang_" + mcVersion + ".jar");
+        File serverJar = new File("cache/", "server_" + mcVersion + ".jar");
+        if (serverJar.exists()) {
+            return serverJar;
+        }
+
+        if (mojangJar.exists()) {
+            File tempDir = new File("cache/", UUID.randomUUID() + "/");
+            if (!tempDir.exists()) tempDir.mkdirs();
+            JarUnpacker unpacker = new JarUnpacker();
+            unpacker.unpack(mojangJar.getPath(), tempDir.getPath());
+
+            File serverJer = new File(tempDir, "/META-INF/versions/" + mcVersion + "/" + "server-" + mcVersion + ".jar");
+            serverJer.renameTo(serverJar);
+            tempDir.delete();
+            if (tempDir.exists()) deleteDirectory(tempDir);
+        } else {
+            System.out.println("MINECRAFT JAR NOT FOUND! EXPECT THERE TO BE ISSUES");
+            System.out.println("To add the minecraft jar manually get the minecraft jar *it needs to be obfuscated like the official mojang server* and put it in the cache folder and name it server_" + mcVersion + ".jar");
+        }
+        return serverJar;
+    }
 
     static boolean deleteDirectory(File directoryToBeDeleted) {
         File[] allContents = directoryToBeDeleted.listFiles();
