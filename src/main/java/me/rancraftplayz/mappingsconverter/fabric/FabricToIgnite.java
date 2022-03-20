@@ -102,25 +102,25 @@ public class FabricToIgnite {
 
         File minecraftJarIntermediary = new File(new File("cache/"), "minecraft-" + mcVersion + "-intermediary.jar");
         if (!minecraftJarIntermediary.exists()) {
-            File uwu = Spigot.downloadServerJar(mcVersion);
+            File uwu = getServerJar(mcVersion, MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")));
             remap(uwu.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), new ArrayList<>(), to, true, "intermediary");
             uwu.renameTo(minecraftJarIntermediary);
         }
         File minecraftJarYarn = new File(new File("cache/"), "minecraft-" + mcVersion + "-yarn.jar");
         if (!minecraftJarYarn.exists()) {
-            File uwu = Spigot.downloadServerJar(mcVersion);
+            File uwu = getServerJar(mcVersion, MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")));
             remap(uwu.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), new ArrayList<>(), to, true, "named");
             uwu.renameTo(minecraftJarYarn);
         }
         File minecraftJarMojang = new File(new File("cache/"), "minecraft-" + mcVersion + "-mojang.jar");
         if (!minecraftJarMojang.exists()) {
-            File uwu = Spigot.downloadServerJar(mcVersion);
+            File uwu = getServerJar(mcVersion, MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")));
             remap(uwu.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), new ArrayList<>(), to, true, "mojang");
             uwu.renameTo(minecraftJarMojang);
         }
         File minecraftJarSpigot = new File(new File("cache/"), "minecraft-" + mcVersion + "-spigot.jar");
         if (!minecraftJarSpigot.exists()) {
-            File uwu = Spigot.downloadServerJar(mcVersion);
+            File uwu = getServerJar(mcVersion, MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")));
             uwu.renameTo(minecraftJarSpigot);
         }
 
