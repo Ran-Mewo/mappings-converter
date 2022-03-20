@@ -63,7 +63,7 @@ public class FabricToIgnite {
                 for (File f : files) {
                     if (FilenameUtils.getExtension(f.getName()).equals("jar")) {
                         File omg = new File(tempDir, "META-INF/jars/" + "temp/");
-                        convert(f, outputDir, omg, true, mcVersion, isDevelopment);
+                        convert(f, metaInf, omg, true, mcVersion, isDevelopment);
                     }
                 }
             }
