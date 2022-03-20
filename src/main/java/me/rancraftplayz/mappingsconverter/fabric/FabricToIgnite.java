@@ -228,7 +228,9 @@ public class FabricToIgnite {
             }
             actualDependencies.add(s);
         });
-        accessWideners.add(modMetadata.getAccessWidener());
+        if (modMetadata.getAccessWidener() != null) {
+            accessWideners.add(modMetadata.getAccessWidener());
+        }
 
         IgniteModJson igniteModJson = new IgniteModJson(modMetadata.getId(), modMetadata.getVersion().getFriendlyString(), null, actualDependencies, null, modMetadata.getMixinConfigs(EnvType.SERVER).stream().toList(), accessWideners);
         // Convert IgniteModJson to json
