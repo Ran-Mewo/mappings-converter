@@ -150,21 +150,21 @@ public class RemapAccessWidener {
             reader = new AccessWidenerReader(remapper);
         }
         if (accessWidener.getNamespace().equals("intermediary")) {
-            tinyRemapper = TinyRemapper.newRemapper().withMappings(TinyUtils.createTinyMappingProvider(mappings.toPath(), "intermediary", "official")).ignoreConflicts(true).renameInvalidLocals(true).rebuildSourceFilenames(true).resolveMissing(true).build();
+            tinyRemapper = TinyRemapper.newRemapper().withMappings(TinyUtils.createTinyMappingProvider(mappings.toPath(), "intermediary", "spigot")).ignoreConflicts(true).renameInvalidLocals(true).rebuildSourceFilenames(true).resolveMissing(true).build();
             for (Path path : libraries) {
                 tinyRemapper.readClassPath(path);
             }
 
-            AccessWidenerRemapper remapper = new AccessWidenerRemapper(writer, tinyRemapper.getRemapper(), "intermediary", "official");
+            AccessWidenerRemapper remapper = new AccessWidenerRemapper(writer, tinyRemapper.getRemapper(), "intermediary", "spigot");
             reader = new AccessWidenerReader(remapper);
         }
         if (accessWidener.getNamespace().equals("named")) {
-            tinyRemapper = TinyRemapper.newRemapper().withMappings(TinyUtils.createTinyMappingProvider(mappings.toPath(), "named", "official")).ignoreConflicts(true).renameInvalidLocals(true).rebuildSourceFilenames(true).resolveMissing(true).build();
+            tinyRemapper = TinyRemapper.newRemapper().withMappings(TinyUtils.createTinyMappingProvider(mappings.toPath(), "named", "spigot")).ignoreConflicts(true).renameInvalidLocals(true).rebuildSourceFilenames(true).resolveMissing(true).build();
             for (Path path : libraries) {
                 tinyRemapper.readClassPath(path);
             }
 
-            AccessWidenerRemapper remapper = new AccessWidenerRemapper(writer, tinyRemapper.getRemapper(), "named", "official");
+            AccessWidenerRemapper remapper = new AccessWidenerRemapper(writer, tinyRemapper.getRemapper(), "named", "spigot");
             reader = new AccessWidenerReader(remapper);
         }
         //System.out.println(accessWidener.getNamespace());

@@ -132,8 +132,8 @@ public class FabricToIgnite {
         libs.add(minecraftJarSpigot.toPath());
 
         if (accessWidener != null) {
-//            MojangSpigotRemapper.remapAccessWidenerNoNewFile(accessWidener.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")).toPath(), libs);
-            awRemapper.remap(accessWidener);
+            MojangSpigotRemapper.remapAccessWidenerNoNewFile(accessWidener.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")).toPath(), libs);
+//            awRemapper.remap(accessWidener);
         }
 
         jarFile.getParentFile().mkdirs();
