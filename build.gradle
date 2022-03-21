@@ -28,6 +28,7 @@ dependencies {
 shadowJar {
     archiveBaseName.set("mappingsconverter")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    relocate 'net.fabricmc.accesswidener', 'hgutfjdkemjfiewjuiojfnnsmires.net.fabricmc.accesswidener'
 
     exclude(
             "**/LICENSE.md",

@@ -27,12 +27,13 @@ public class RemapAccessWidener {
         int version = 1;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(accessWidenerFile))) {
+            version = AccessWidenerReader.readVersion(reader);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(accessWidenerFile))) {
             accessWidenerReader.read(reader);
-            try {
-                version = AccessWidenerReader.readVersion(reader);
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to read project access widener file");
         }
@@ -117,12 +118,13 @@ public class RemapAccessWidener {
         int version = 1;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(accessWidenerFile))) {
+            version = AccessWidenerReader.readVersion(reader);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(accessWidenerFile))) {
             accessWidenerReader.read(reader);
-            try {
-                version = AccessWidenerReader.readVersion(reader);
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to read project access widener file");
         }
