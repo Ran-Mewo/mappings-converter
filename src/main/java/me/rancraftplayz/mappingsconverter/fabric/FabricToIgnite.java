@@ -274,7 +274,7 @@ public class FabricToIgnite {
         dependencies.forEach(s -> {
             if (Objects.equals(s, "fabricloader") || Objects.equals(s, "fabric-loader")) {
 //                dependencies.remove(s);
-//                actualDependencies.add("ignited-fabricloader");
+                actualDependencies.add("!ignited-fabricloader");
                 return;
             }
             if (Objects.equals(s, "java") || Objects.equals(s, "minecraft")) {
@@ -287,7 +287,7 @@ public class FabricToIgnite {
             accessWideners.add(modMetadata.getAccessWidener());
         }
 
-        IgniteModJson igniteModJson = new IgniteModJson(modMetadata.getId(), modMetadata.getVersion().getFriendlyString(), null, actualDependencies, null, modMetadata.getMixinConfigs(EnvType.SERVER).stream().toList(), accessWideners);
+        IgniteModJson igniteModJson = new IgniteModJson(modMetadata.getId(), modMetadata.getVersion().getFriendlyString(), null, null, actualDependencies, modMetadata.getMixinConfigs(EnvType.SERVER).stream().toList(), accessWideners);
         // Convert IgniteModJson to json
         Gson gson = new Gson();
         String json = gson.toJson(igniteModJson);
