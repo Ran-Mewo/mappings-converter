@@ -65,6 +65,14 @@ public class FabricToIgnite {
                     }
                 }
             }
+            File metaInf = new File(tempDir, "META-INF/");
+            File[] files = metaInf.listFiles();
+
+            for (File f : files) {
+                if (FilenameUtils.getExtension(f.getName()).equals("SF") || FilenameUtils.getExtension(f.getName()).equals("RSA")) {
+                    f.delete();
+                }
+            }
             convertJson(new FileInputStream(new File(tempDir, "fabric.mod.json")), new File(tempDir, "ignite.mod.json"));
 
             if (isDevelopment) {
@@ -266,7 +274,7 @@ public class FabricToIgnite {
         dependencies.forEach(s -> {
             if (Objects.equals(s, "fabricloader") || Objects.equals(s, "fabric-loader")) {
 //                dependencies.remove(s);
-                actualDependencies.add("ignited-fabricloader");
+//                actualDependencies.add("ignited-fabricloader");
                 return;
             }
             if (Objects.equals(s, "java") || Objects.equals(s, "minecraft")) {
