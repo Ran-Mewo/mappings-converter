@@ -1,6 +1,9 @@
 package me.rancraftplayz.mappingsconverter.fabric;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import fr.stevecohen.jarmanager.JarPacker;
 import fr.stevecohen.jarmanager.JarUnpacker;
 import me.ran.mappings_stuff_idk.util.Spigot;
@@ -74,6 +77,7 @@ public class FabricToIgnite {
                 }
             }
             convertJson(new FileInputStream(new File(tempDir, "fabric.mod.json")), new File(tempDir, "ignite.mod.json"));
+            convertMixinJsons(new FileInputStream(new File(tempDir, "fabric.mod.json")), tempDir);
 
             if (isDevelopment) {
                 return map(jarFile, tempDir, mcVersion, "mojang", metaverse, file, outputDir, isDevelopment, modMetadata.getAccessWidener());
@@ -82,6 +86,35 @@ public class FabricToIgnite {
             }
         }
         return jarFile;
+    }
+
+    public void convertMixinJsons(InputStream is, File mixinLocation) throws ParseMetadataException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        if (modMetadata == null) {
+            modMetadata = readModMetadata(is);
+            entryPointer.loadMetadata(modMetadata);
+        }
+
+        modMetadata.getMixinConfigs(EnvType.SERVER).forEach(mixinConfig -> {
+            File mixinJson = new File(mixinLocation, mixinConfig);
+            if (mixinJson.exists()) {
+                try {
+                    com.google.gson.stream.JsonReader reader = new com.google.gson.stream.JsonReader(new FileReader(mixinJson));
+                    JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+                    if (jsonObject.has("client")) {
+                        jsonObject.remove("client");
+                    }
+                    if (!jsonObject.has("minVersion")) {
+                        jsonObject.add("minVersion", new JsonPrimitive("0.8"));
+                    }
+                    FileWriter writer = new FileWriter(mixinJson, false);
+                    writer.write(jsonObject.toString());
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
 //    static List<File> classFiles = new ArrayList<>();
