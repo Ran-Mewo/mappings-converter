@@ -57,32 +57,36 @@ public class FabricToIgnite {
 
             modMetadata = readModMetadata(new FileInputStream(new File(tempDir, "fabric.mod.json")));
             entryPointer.loadMetadata(modMetadata);
-            if (!modMetadata.getJars().isEmpty()) {
-                File metaInf = new File(tempDir, "META-INF/jars");
+            if (modMetadata.getEnvironment().matches(EnvType.SERVER)) {
+                if (!modMetadata.getJars().isEmpty()) {
+                    File metaInf = new File(tempDir, "META-INF/jars");
+                    File[] files = metaInf.listFiles();
+
+                    for (File f : files) {
+                        if (FilenameUtils.getExtension(f.getName()).equals("jar")) {
+                            File omg = new File(tempDir, "META-INF/jars/" + "temp/");
+                            convert(f, metaInf, omg, true, mcVersion, isDevelopment);
+                        }
+                    }
+                }
+                File metaInf = new File(tempDir, "META-INF/");
                 File[] files = metaInf.listFiles();
 
                 for (File f : files) {
-                    if (FilenameUtils.getExtension(f.getName()).equals("jar")) {
-                        File omg = new File(tempDir, "META-INF/jars/" + "temp/");
-                        convert(f, metaInf, omg, true, mcVersion, isDevelopment);
+                    if (FilenameUtils.getExtension(f.getName()).equals("SF") || FilenameUtils.getExtension(f.getName()).equals("RSA")) {
+                        f.delete();
                     }
                 }
-            }
-            File metaInf = new File(tempDir, "META-INF/");
-            File[] files = metaInf.listFiles();
+                convertJson(new FileInputStream(new File(tempDir, "fabric.mod.json")), new File(tempDir, "ignite.mod.json"));
+                convertMixinJsons(new FileInputStream(new File(tempDir, "fabric.mod.json")), tempDir);
 
-            for (File f : files) {
-                if (FilenameUtils.getExtension(f.getName()).equals("SF") || FilenameUtils.getExtension(f.getName()).equals("RSA")) {
-                    f.delete();
+                if (isDevelopment) {
+                    return map(jarFile, tempDir, mcVersion, "mojang", metaverse, file, outputDir, isDevelopment, modMetadata.getAccessWidener());
+                } else {
+                    return map(jarFile, tempDir, mcVersion, "spigot", metaverse, file, outputDir, isDevelopment, modMetadata.getAccessWidener());
                 }
-            }
-            convertJson(new FileInputStream(new File(tempDir, "fabric.mod.json")), new File(tempDir, "ignite.mod.json"));
-            convertMixinJsons(new FileInputStream(new File(tempDir, "fabric.mod.json")), tempDir);
-
-            if (isDevelopment) {
-                return map(jarFile, tempDir, mcVersion, "mojang", metaverse, file, outputDir, isDevelopment, modMetadata.getAccessWidener());
             } else {
-                return map(jarFile, tempDir, mcVersion, "spigot", metaverse, file, outputDir, isDevelopment, modMetadata.getAccessWidener());
+                jarFile.createNewFile();
             }
         }
         return jarFile;
