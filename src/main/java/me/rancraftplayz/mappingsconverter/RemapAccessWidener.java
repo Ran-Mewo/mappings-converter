@@ -4,8 +4,8 @@ import net.fabricmc.accesswidener.AccessWidener;
 import net.fabricmc.accesswidener.AccessWidenerReader;
 import net.fabricmc.accesswidener.AccessWidenerRemapper;
 import net.fabricmc.accesswidener.AccessWidenerWriter;
-import net.fabricmc.modified.TinyRemapper;
-import net.fabricmc.modified.TinyUtils;
+import net.fabricmc.tinyremapper.TinyRemapper;
+import net.fabricmc.tinyremapper.TinyUtils;
 
 import java.io.*;
 import java.nio.file.Path;
