@@ -23,6 +23,7 @@ import net.fabricmc.modified.OutputConsumerPath;
 import net.fabricmc.modified.TinyRemapper;
 import net.fabricmc.modified.TinyUtils;
 import net.fabricmc.modified.extension.mixin.MixinExtension;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,7 +87,7 @@ public class FabricToIgnite {
                     return map(jarFile, tempDir, mcVersion, "spigot", metaverse, file, outputDir, isDevelopment, modMetadata.getAccessWidener());
                 }
             } else {
-                jarFile.createNewFile();
+                FileUtils.copyFile(file, jarFile);
             }
         }
         return jarFile;
