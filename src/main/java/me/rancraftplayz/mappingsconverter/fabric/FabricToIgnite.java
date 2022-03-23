@@ -36,9 +36,6 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FabricToIgnite {
-//    public static void main(String[] args) throws ParseMetadataException, IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-//        convert(new File("lithium.jar"), new File("outputJar"), new File("temp"), false, "1.18.2", false);
-//    }
     public LoaderModMetadata modMetadata;
     public AccessWidenerRemapper awRemapper;
     public EntryPointer entryPointer;
@@ -105,6 +102,7 @@ public class FabricToIgnite {
                 try {
                     com.google.gson.stream.JsonReader reader = new com.google.gson.stream.JsonReader(new FileReader(mixinJson));
                     JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+                    reader.close();
                     if (jsonObject.has("client")) {
                         jsonObject.remove("client");
                     }
@@ -122,25 +120,7 @@ public class FabricToIgnite {
         });
     }
 
-//    static List<File> classFiles = new ArrayList<>();
     private File map(File jarFile, File directory, String mcVersion, String to, boolean metaverse, File file, File outputDir, boolean isDevelopment, @Nullable String accessWidenerName) throws IOException, ParseMetadataException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-//        if (!classFiles.isEmpty()) classFiles = new ArrayList<>();
-//        findClassFiles(directory);
-//
-//        for (File clazz : classFiles) {
-//            System.out.println(clazz.getName());
-//            TinyRemapper remapper = TinyRemapper.newRemapper().withMappings(TinyUtils.createTinyMappingProvider(MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("mappings/")).toPath(), "intermediary", to)).extension(new MixinExtension()).resolveMissing(true).build();
-//
-//            File tempClass = Paths.get(clazz + ".temp.class").toFile();
-//            OutputConsumerPath outputConsumer = new OutputConsumerPath.Builder(tempClass.toPath()).build();
-//            remapper.readInputs(clazz.toPath());
-//            remapper.apply(outputConsumer);
-//            outputConsumer.close();
-//            remapper.finish();
-//
-//            Files.deleteIfExists(clazz.toPath());
-//            tempClass.renameTo(clazz);
-//        }
         File accessWidener = null;
         if (accessWidenerName != null) {
             accessWidener = new File(directory, accessWidenerName);
@@ -186,7 +166,6 @@ public class FabricToIgnite {
 
         remap(packer.pack(directory.getAbsolutePath(), jarFile.getAbsolutePath()).toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, "named", false, "intermediary");
 
-//        classFiles = new ArrayList<>();
         deleteDirectory(directory);
         remap(jarFile.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, "mojang", false, "named");
         deleteDirectory(directory);
@@ -220,18 +199,6 @@ public class FabricToIgnite {
         Files.deleteIfExists(input);
         tempJar.renameTo(input.toFile());
     }
-
-//    private static void findClassFiles(File directory) {
-//        File[] classes = directory.listFiles();
-//        for (File file : classes) {
-//            if (FilenameUtils.getExtension(file.getName()).equals("class")) {
-//                classFiles.add(file);
-//            }
-//            if (file.isDirectory()) {
-//                findClassFiles(file);
-//            }
-//        }
-//    }
 
     public static File getServerJar(String mcVersion, File mappingsFile) throws IOException {
         File serverJar = new File("cache/", "minecraft-" + mcVersion + "-spigot.jar");
@@ -311,12 +278,10 @@ public class FabricToIgnite {
 
         dependencies.forEach(s -> {
             if (Objects.equals(s, "fabricloader") || Objects.equals(s, "fabric-loader")) {
-//                dependencies.remove(s);
                 actualDependencies.add("!ignited-fabricloader");
                 return;
             }
             if (Objects.equals(s, "java") || Objects.equals(s, "minecraft")) {
-//                dependencies.remove(s);
                 return;
             }
             actualDependencies.add(s);
@@ -326,7 +291,6 @@ public class FabricToIgnite {
         }
 
         IgniteModJson igniteModJson = new IgniteModJson(modMetadata.getId(), modMetadata.getVersion().getFriendlyString(), null, null, actualDependencies, modMetadata.getMixinConfigs(EnvType.SERVER).stream().toList(), accessWideners);
-        // Convert IgniteModJson to json
         Gson gson = new Gson();
         String json = gson.toJson(igniteModJson);
         if (outputFile.exists()) outputFile.delete();
