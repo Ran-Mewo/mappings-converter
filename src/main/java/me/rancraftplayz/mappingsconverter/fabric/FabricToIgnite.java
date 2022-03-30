@@ -108,6 +108,9 @@ public class FabricToIgnite {
                     if (jsonObject.has("client")) {
                         jsonObject.remove("client");
                     }
+                    if (jsonObject.has("compatibilityLevel")) {
+                        jsonObject.remove("compatibilityLevel");
+                    }
                     if (!jsonObject.has("minVersion")) {
                         jsonObject.add("minVersion", new JsonPrimitive("0.8"));
                     }
@@ -171,13 +174,18 @@ public class FabricToIgnite {
 
         jarFile.getParentFile().mkdirs();
 
-        remap(packer.pack(directory.getAbsolutePath(), jarFile.getAbsolutePath()).toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, "named", false, "intermediary");
-
+        remap(packer.pack(directory.getAbsolutePath(), jarFile.getAbsolutePath()).toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, "intermediary", false, "named");
         deleteDirectory(directory);
+
+        remap(jarFile.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, "named", false, "intermediary");
+        deleteDirectory(directory);
+
         remap(jarFile.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, "mojang", false, "named");
         deleteDirectory(directory);
+
         remap(jarFile.toPath(), MojangSpigotRemapper.proguardCsrgTiny(mcVersion, new File("cache/mappings/")), libs, to, false, "mojang");
         deleteDirectory(directory);
+
         return jarFile;
     }
 
@@ -297,7 +305,7 @@ public class FabricToIgnite {
             accessWideners.add(modMetadata.getAccessWidener());
         }
 
-        IgniteModJson igniteModJson = new IgniteModJson(modMetadata.getId(), modMetadata.getVersion().getFriendlyString(), null, null, actualDependencies, modMetadata.getMixinConfigs(EnvType.SERVER).stream().toList(), accessWideners);
+        IgniteModJson igniteModJson = new IgniteModJson(modMetadata.getId(), modMetadata.getVersion().getFriendlyString(), null, null, actualDependencies, new ArrayList<>(modMetadata.getMixinConfigs(EnvType.SERVER)), accessWideners);
         Gson gson = new Gson();
         String json = gson.toJson(igniteModJson);
         if (outputFile.exists()) outputFile.delete();

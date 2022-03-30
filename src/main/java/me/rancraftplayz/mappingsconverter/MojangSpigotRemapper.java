@@ -14,13 +14,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class MojangSpigotRemapper {
     public static void remapAll(Path input, File mappingsDir, String mcVersion, List<Path> libraries, @Nullable Path accessWidener,@Nullable List<Path> accessWidnerLibs) throws IOException {
         File mappings = proguardCsrgTiny(mcVersion, mappingsDir);
         if (accessWidener != null) {
-            remapAccessWidener(input, accessWidener, mappings.toPath(), Objects.requireNonNullElseGet(accessWidnerLibs, ArrayList::new));
+            if (accessWidnerLibs == null) accessWidnerLibs = new ArrayList<>();
+            remapAccessWidener(input, accessWidener, mappings.toPath(), accessWidnerLibs);
         }
         remap(input, mappings, libraries);
     }
